@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Basing Box Game - Premium Order</title>
+
+<style>
+body {
+  margin:0;
+  font-family: 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at center, #05070f, #000);
+  color:#fff;
+}
+
+header {
+  text-align:center;
+  padding:30px;
+}
+
+header img {
+  width:130px;
+  border-radius:50%;
+  box-shadow:0 0 25px #00eaff;
+}
+
+header h1 {
+  margin:10px 0 5px;
+  font-size:34px;
+  letter-spacing:2px;
+}
+
+header p {
+  opacity:0.7;
+}
+
+.container {
+  max-width:650px;
+  margin:auto;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(15px);
+  padding:25px;
+  border-radius:20px;
+  box-shadow:0 0 30px rgba(0,200,255,0.3);
+}
+
+.price-box {
+  background:linear-gradient(145deg,#0a0f2a,#020412);
+  padding:15px;
+  border-radius:15px;
+  margin-bottom:20px;
+  box-shadow:0 0 20px rgba(0,150,255,0.2);
+}
+
+.price-box h3 {margin-top:0;}
+
+label {margin-top:10px; display:block;}
+
+input, select {
+  width:100%;
+  padding:12px;
+  margin-top:5px;
+  border-radius:10px;
+  border:none;
+  background:#0a0a0a;
+  color:#fff;
+}
+
+button {
+  margin-top:20px;
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(90deg,#00eaff,#0072ff);
+  color:#fff;
+  font-size:16px;
+  cursor:pointer;
+}
+
+button:hover {opacity:0.85;}
+
+.total-box {
+  margin-top:15px;
+  padding:15px;
+  border-radius:12px;
+  background:#020617;
+  box-shadow:0 0 15px rgba(0,255,255,0.2);
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <img src="/mnt/data/IMG_20260321_012941.jpg">
+  <h1>Basing Box Game</h1>
+  <p>Think Unlimited • Premium Gaming Rental</p>
+</header>
+
+<div class="container">
+
+<div class="price-box">
+<h3>🎮 Price List</h3>
+<p>12 Jam - 75K</p>
+<p>24 Jam - 140K</p>
+<p>2 Hari - 250K</p>
+<p>3 Hari - 325K</p>
+<p>7 Hari - 600K</p>
+<p>✔ Standar: 3 Stik</p>
+</div>
+
+<form id="orderForm">
+
+<label>Nama</label>
+<input type="text" id="nama" required>
+
+<label>No WhatsApp</label>
+<input type="text" id="wa" required>
+
+<label>Pilih Paket</label>
+<select id="paket">
+  <option value="75000">12 Jam - 75K</option>
+  <option value="140000">24 Jam - 140K</option>
+  <option value="250000">2 Hari - 250K</option>
+  <option value="325000">3 Hari - 325K</option>
+  <option value="600000">7 Hari - 600K</option>
+</select>
+
+<label>Tambah Stik (+5K / stik)</label>
+<select id="stik">
+  <option value="0">Tidak</option>
+  <option value="1">+1 Stik</option>
+  <option value="2">+2 Stik</option>
+  <option value="3">+3 Stik</option>
+</select>
+
+<label>Alamat</label>
+<input type="text" id="alamat" required>
+
+<label>Jarak (KM)</label>
+<input type="number" id="jarak" required>
+
+<div class="total-box">
+<strong>Total Harga: Rp <span id="total">0</span></strong>
+</div>
+
+<button type="submit">🚀 Kirim Order</button>
+
+</form>
+</div>
+
+<script>
+function hitungTotal(){
+  let paket = parseInt(document.getElementById('paket').value);
+  let stik = parseInt(document.getElementById('stik').value);
+  let jarak = parseInt(document.getElementById('jarak').value) || 0;
+
+  let biayaStik = stik * 5000;
+  let ongkir = 0;
+
+  if(jarak > 7){
+    ongkir = (jarak - 7) * 3000;
+  }
+
+  let total = paket + biayaStik + ongkir;
+  document.getElementById('total').innerText = total.toLocaleString('id-ID');
+}
+
+['paket','stik','jarak'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',hitungTotal);
+});
+
+
+document.getElementById('orderForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  let nama = document.getElementById('nama').value;
+  let wa = document.getElementById('wa').value;
+  let paketText = document.getElementById('paket').selectedOptions[0].text;
+  let stik = document.getElementById('stik').value;
+  let alamat = document.getElementById('alamat').value;
+  let jarak = document.getElementById('jarak').value;
+  let total = document.getElementById('total').innerText;
+
+  let mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(alamat)}`;
+
+  let pesan = `ORDER BASING BOX GAME 🚀%0A\nNama: ${nama}%0A
+WA: ${wa}%0A
+Paket: ${paketText}%0A
+Tambah Stik: ${stik}%0A
+Jarak: ${jarak} KM%0A
+Total: Rp ${total}%0A
+Alamat: ${alamat}%0A
+Maps: ${mapsLink}`;
+
+  let nomorAdmin = '6287788774078';
+
+  window.open(`https://wa.me/${nomorAdmin}?text=${pesan}`, '_blank');
+});
+</script>
+
+</body>
+</html>

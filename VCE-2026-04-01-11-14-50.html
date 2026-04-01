@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Basingbox Member Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+</head>
+<body class="bg-black text-white font-sans">
+
+<div class="p-5">
+  <h1 class="text-2xl font-bold text-green-400">Basingbox Admin Panel</h1>
+
+  <!-- Login Admin -->
+  <div id="loginBox" class="mt-5 bg-gray-900 p-4 rounded-2xl">
+    <h2>Login Admin</h2>
+    <input id="password" type="password" placeholder="Password" class="w-full p-2 mt-2 rounded bg-gray-800">
+    <button onclick="login()" class="mt-3 bg-green-500 px-4 py-2 rounded">Login</button>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" class="hidden">
+
+    <!-- Register -->
+    <div class="mt-5 bg-gray-900 p-4 rounded-2xl">
+      <h2>Tambah Member</h2>
+      <input id="name" placeholder="Nama" class="w-full p-2 mt-2 rounded bg-gray-800">
+      <input id="phone" placeholder="No HP" class="w-full p-2 mt-2 rounded bg-gray-800">
+      <button onclick="register()" class="mt-3 bg-green-500 px-4 py-2 rounded">Tambah</button>
+    </div>
+
+    <!-- Member List -->
+    <div class="mt-5">
+      <h2>Data Member</h2>
+      <ul id="memberList" class="mt-2"></ul>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// 🔥 GANTI DENGAN CONFIG FIREBASE KAMU
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+};
+
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+function login(){
+  const pass = document.getElementById('password').value;
+  if(pass === 'admin123'){
+    document.getElementById('loginBox').style.display='none';
+    document.getElementById('dashboard').classList.remove('hidden');
+    loadMembers();
+  } else {
+    alert('Password salah');
+  }
+}
+
+function register(){
+  const name = document.getElementById('name').value;
+  const phone = document.getElementById('phone').value;
+
+  const id = 'BBG' + Math.floor(Math.random()*10000);
+
+  db.collection("members").add({
+    id, name, phone, points:0
+  });
+
+  loadMembers();
+}
+
+function loadMembers(){
+  const list = document.getElementById('memberList');
+  list.innerHTML = '';
+
+  db.collection("members").get().then(snapshot => {
+    snapshot.forEach(doc => {
+      const m = doc.data();
+
+      const qrId = 'qr-' + m.id;
+
+      list.innerHTML += `
+        <li class="bg-gray-800 p-3 rounded mt-2">
+          <p><b>${m.name}</b> (${m.phone})</p>
+          <p>ID: ${m.id}</p>
+          <p>Poin: ${m.points}</p>
+          <canvas id="${qrId}" class="mt-2"></canvas>
+          <button onclick="addPoint('${doc.id}', ${m.points})" class="mt-2 bg-blue-500 px-2 py-1 rounded">+Poin</button>
+        </li>
+      `;
+
+      setTimeout(()=>{
+        QRCode.toCanvas(document.getElementById(qrId), m.id);
+      },100);
+    });
+  });
+}
+
+function addPoint(docId, current){
+  db.collection("members").doc(docId).update({
+    points: current + 1
+  });
+  loadMembers();
+}
+</script>
+
+</body>
+</html>
